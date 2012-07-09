@@ -1,49 +1,65 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <title>Recorder Thing</title>
-<button onclick="startRecording()">Start Recording</button>
-<button onclick="stopRecording()">Stop Recording</button>
-<div id="playback" style="padding-top: 10px;"></div>
-<div id="time" style="position: absolute; top: 0px; right: 0px; background: firebrick; padding: 10px; color: white;">Not currently recording.</div>
-<div id="wami" style="margin-left: 100px;"></div>
-<!-- swfobject is a commonly used library to embed Flash content -->
-<script src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+<style>
+#playback {
+  padding-top: 10px;
+}
 
+#time {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  padding: 10px;
+  background: firebrick;
+  color: white;
+}
+
+#wami {
+  margin-left: 100px;
+}
+</style>
+<button id="start">Start Recording</button>
+<button id="stop">Stop Recording</button>
+<div id="playback"></div>
+<div id="time">Not currently recording.</div>
+<div id="wami"></div>
+<!-- swfobject is a commonly used library to embed Flash content -->
+<script src="swfobject.js"></script>
+<script src="jquery.min.js"></script>
 <!-- Setup the recorder interface -->
-<script type="text/javascript" src="recorder.js"></script>
+<script src="recorder.js"></script>
 <script>
 var recordState = "loading";
 var recordStart = 0;
-var playback = document.getElementById("playback");
-var time = document.getElementById("time");
 
 setInterval(function() {
   var now = Date.now();
-  if (recordStart) {
-    time.textContent = ((now - recordStart) / 1000).toFixed(2);
-  }
+  if (recordStart)
+    $("#time").text(((now - recordStart) / 1000).toFixed(2));
 }, 50);
 
-function stopRecording() {
+$("#stop").click(function stopRecording() {
   if (recordState == "recording") {
     console.log("STOP HAZ BEEN CLICK'D");
     Wami.stopRecording();
     recordState = "uploading";
   }
-}
+});
 
-function startRecording() {
+$("#start").click(function startRecording() {
+  var playback = $("#playback");
   if (recordState != "idle")
     return;
   recordState = "recording";
-  playback.innerHTML = "";
+  playback.empty();
   Wami.startRecording("/audio",
     Wami.nameCallback(function() {
       console.log("START");
       recordStart = Date.now();
     }),
     Wami.nameCallback(function() {
-      playback.innerHTML = "";
+      playback.empty();
       var audio = document.createElement("audio");
       audio.setAttribute("controls", "controls");
       var source = document.createElement("source");
@@ -54,7 +70,7 @@ function startRecording() {
       source.setAttribute("src", "outfile.ogg?bust=" + recordStart);
       source.setAttribute("type", "audio/ogg");
       audio.appendChild(source);
-      playback.appendChild(audio);
+      playback.append(audio);
       recordState = "idle";
       recordStart = 0;
     }),
@@ -65,14 +81,14 @@ function startRecording() {
       recordStart = 0;
     })
   );
-}
+});
 
-onload = function setupRecorder() {
+$(window).ready(function() {
   Wami.setup({
     id : "wami",
     onReady : function() {
       recordState = "idle";
     }
   });
-};
+});
 </script>
