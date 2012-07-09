@@ -15,3 +15,8 @@ app.post('/audio', function(req, res) {
 app.use(express.static(STATIC_DIR))
 
 module.exports = app;
+
+if (!module.parent) {
+  console.log("listening on 3000");
+  app.listen(3000);
+}
