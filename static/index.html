@@ -41,9 +41,16 @@ setInterval(function() {
 
 $("#stop").click(function stopRecording() {
   if (recordState == "recording") {
-    console.log("STOP HAZ BEEN CLICK'D");
     Wami.stopRecording();
     recordState = "uploading";
+    jQuery.ajax({
+      type: 'POST',
+      url: '/metadata',
+      data: JSON.stringify({hi: 'there'}),
+      success: function() {
+        console.log("metadata uploaded.");
+      }
+    });
   }
 });
 

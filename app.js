@@ -7,6 +7,14 @@ var STATIC_DIR = __dirname + '/static',
     FFMPEG_VORBIS = 'ffmpeg',
     FFMPEG_MP3 = '/Applications/ffmpegX.app/Contents/Resources/ffmpeg';
 
+app.post('/metadata', function(req, res) {
+  var filename = STATIC_DIR + '/metadata.json',
+      outfile = fs.createWriteStream(filename);
+  
+  req.pipe(outfile);
+  res.send("Thanks!");
+});
+
 app.post('/audio', function(req, res) {
   var name = req.get('name', 'UNKNOWN'),
       basefilename = STATIC_DIR + '/outfile',
