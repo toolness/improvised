@@ -4,6 +4,7 @@
 <button onclick="startRecording()">Start Recording</button>
 <button onclick="stopRecording()">Stop Recording</button>
 <div id="playback" style="padding-top: 10px;"></div>
+<div id="time" style="position: absolute; top: 0px; right: 0px; background: firebrick; padding: 10px; color: white;">Not currently recording.</div>
 <div id="wami" style="margin-left: 100px;"></div>
 <!-- swfobject is a commonly used library to embed Flash content -->
 <script src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
@@ -12,6 +13,16 @@
 <script type="text/javascript" src="recorder.js"></script>
 <script>
 var recordState = "loading";
+var recordStart = 0;
+var playback = document.getElementById("playback");
+var time = document.getElementById("time");
+
+setInterval(function() {
+  var now = Date.now();
+  if (recordStart) {
+    time.textContent = ((now - recordStart) / 1000).toFixed(2);
+  }
+}, 50);
 
 function stopRecording() {
   if (recordState == "recording") {
@@ -25,31 +36,33 @@ function startRecording() {
   if (recordState != "idle")
     return;
   recordState = "recording";
+  playback.innerHTML = "";
   Wami.startRecording("/audio",
     Wami.nameCallback(function() {
       console.log("START");
+      recordStart = Date.now();
     }),
     Wami.nameCallback(function() {
-      var playback = document.getElementById("playback");
-      var now = Date.now();
       playback.innerHTML = "";
       var audio = document.createElement("audio");
       audio.setAttribute("controls", "controls");
       var source = document.createElement("source");
-      source.setAttribute("src", "outfile.mp3?bust=" + now);
+      source.setAttribute("src", "outfile.mp3?bust=" + recordStart);
       source.setAttribute("type", "audio/mp3");
       audio.appendChild(source);
       source = document.createElement("source");
-      source.setAttribute("src", "outfile.ogg?bust=" + now);
+      source.setAttribute("src", "outfile.ogg?bust=" + recordStart);
       source.setAttribute("type", "audio/ogg");
       audio.appendChild(source);
       playback.appendChild(audio);
       recordState = "idle";
+      recordStart = 0;
     }),
     Wami.nameCallback(function() {
       console.log("ERROR");
       alert("ERROR");
       recordState = "idle";
+      recordStart = 0;
     })
   );
 }
