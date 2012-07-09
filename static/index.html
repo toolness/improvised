@@ -1,38 +1,65 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html>
-<head>
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Recorder Thing</title>
+<button onclick="startRecording()">Start Recording</button>
+<button onclick="stopRecording()">Stop Recording</button>
+<div id="playback" style="padding-top: 10px;"></div>
+<div id="wami" style="margin-left: 100px;"></div>
 <!-- swfobject is a commonly used library to embed Flash content -->
-<script type="text/javascript"
-	src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
 
 <!-- Setup the recorder interface -->
 <script type="text/javascript" src="recorder.js"></script>
-
-<!-- GUI code... take it or leave it -->
-<script type="text/javascript" src="gui.js"></script>
-
 <script>
-	function setupRecorder() {
-		Wami.setup({
-			id : "wami",
-			onReady : setupGUI
-		});
-	}
+var recordState = "loading";
 
-	function setupGUI() {
-		var gui = new Wami.GUI({
-			id : "wami",
-			recordUrl : "/audio",
-			playUrl : "/outfile.wav"
-		});
+function stopRecording() {
+  if (recordState == "recording") {
+    console.log("STOP HAZ BEEN CLICK'D");
+    Wami.stopRecording();
+    recordState = "uploading";
+  }
+}
 
-		gui.setPlayEnabled(false);
-	}
+function startRecording() {
+  if (recordState != "idle")
+    return;
+  recordState = "recording";
+  Wami.startRecording("/audio",
+    Wami.nameCallback(function() {
+      console.log("START");
+    }),
+    Wami.nameCallback(function() {
+      var playback = document.getElementById("playback");
+      var now = Date.now();
+      playback.innerHTML = "";
+      var audio = document.createElement("audio");
+      audio.setAttribute("controls", "controls");
+      var source = document.createElement("source");
+      source.setAttribute("src", "outfile.mp3?bust=" + now);
+      source.setAttribute("type", "audio/mp3");
+      audio.appendChild(source);
+      source = document.createElement("source");
+      source.setAttribute("src", "outfile.ogg?bust=" + now);
+      source.setAttribute("type", "audio/ogg");
+      audio.appendChild(source);
+      playback.appendChild(audio);
+      recordState = "idle";
+    }),
+    Wami.nameCallback(function() {
+      console.log("ERROR");
+      alert("ERROR");
+      recordState = "idle";
+    })
+  );
+}
+
+onload = function setupRecorder() {
+  Wami.setup({
+    id : "wami",
+    onReady : function() {
+      recordState = "idle";
+    }
+  });
+};
 </script>
-</head>
-
-<body onload="setupRecorder()">
-	<div id="wami" style="margin-left: 100px;"></div>
-	<noscript>WAMI requires Javascript</noscript>
-</body>
-</html>

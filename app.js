@@ -19,7 +19,18 @@ app.post('/audio', function(req, res) {
     console.log("DATA", chunk.length);
   });
   outfile.on('close', function() {
-    console.log("OUTFILE CLOSED, converting to ogggg.");
+    function onExit(code) {
+      exitCodes.push(code);
+      if (exitCodes.length == 2) {
+        fs.unlinkSync(wavfilename);
+        if (exitCodes[0] == 0 && exitCodes[1] == 0)
+          res.send("Thanks!");
+        else
+          res.send("Error!", 500);
+      }
+    }
+    
+    var exitCodes = [];
     var baseArgs = ['-i', wavfilename, '-y'];
     var mp3 = spawn(FFMPEG_MP3, baseArgs.concat([
       '-acodec', 'mp3',
@@ -31,15 +42,9 @@ app.post('/audio', function(req, res) {
       '-ac', '2',
       basefilename + '.ogg'
     ]));
-    mp3.on('exit', function(code) {
-      console.log('mp3 exited with code', code);
-    });
-    vorbis.on('exit', function(code) {
-      console.log('vorbis exited with code', code);
-    });
-    console.log('ok');
+    mp3.on('exit', onExit);
+    vorbis.on('exit', onExit);
   });
-  res.send("THANKS YO");
 });
 
 app.use(express.static(STATIC_DIR))
