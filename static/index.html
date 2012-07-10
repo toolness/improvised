@@ -1,83 +1,8 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
+<link rel="stylesheet" href="css/recorder-widget.css">
 <title>Recorder Thing</title>
-<style>
-body {
-}
-
-#recorder {
-  position: relative;
-  background: #f0f0f0;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 12px;
-  padding: 20px;
-  min-height: 180px;
-}
-
-#recorder button {
-  font: inherit;
-  border: none;
-  cursor: pointer;
-  background: gray;
-  color: white;
-  padding: 10px;
-  position: relative;
-  z-index: 1000;
-}
-
-#recorder button:hover {
-  background: black;
-}
-
-#recorder.loading:before {
-  content: 'Please wait, loading...';
-  color: gray;
-}
-
-#recorder.uploading:before {
-  content: 'Please wait, uploading...';
-  color: gray;
-}
-
-#recorder:not(.recording) .stop {
-  display: none;
-}
-
-#recorder:not(.recording) time {
-  opacity: 0;
-}
-
-#recorder:not(.idle) .start {
-  display: none;
-}
-
-#recorder .playback {
-  position: absolute;
-  bottom: 0px;
-  left: 0px;
-  right: 0px;
-  width: 100%;
-}
-
-#recorder .playback audio {
-  width: 100%;
-}
-
-#recorder time {
-  padding-left: 10px;
-  color: firebrick;
-}
-
-#recorder time:after {
-  content: 's';
-}
-
-#recorder .wami {
-  min-height: 10px;
-  min-width: 10px;
-}
-</style>
-<div id="recorder">
+<div class="recorder" id="my-recorder">
   <button class="start">Start Recording</button>
   <button class="stop">Stop Recording</button>
   <time></time>
@@ -93,7 +18,7 @@ body {
 <script>
 $(window).ready(function() {
   var recorder = window._recorder = RecorderWidget({
-    element: $("#recorder")
+    element: $("#my-recorder")
   }).on("state-change", function(event) {
     console.log("STATE CHANGE", this.state, this.startTime);
     if (this.state == "recording")
