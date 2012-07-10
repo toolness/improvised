@@ -2,11 +2,59 @@
 <meta charset="utf-8">
 <title>Recorder Thing</title>
 <style>
-#playback {
+body {
+  background: #f0f0f0;
+  margin: 0;
+  padding: 0;
+}
+
+#recorder {
+  position: relative;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  padding: 20px;
+}
+
+#recorder button {
+  font: inherit;
+  border: none;
+  cursor: pointer;
+  background: gray;
+  color: white;
+  padding: 10px;
+}
+
+#recorder button:hover {
+  background: black;
+}
+
+#recorder.loading:before {
+  content: 'Please wait, loading...';
+  color: gray;
+}
+
+#recorder.uploading:before {
+  content: 'Please wait, uploading...';
+  color: gray;
+}
+
+#recorder:not(.recording) .stop {
+  display: none;
+}
+
+#recorder:not(.recording) time {
+  display: none;
+}
+
+#recorder:not(.idle) .start {
+  display: none;
+}
+
+#recorder .playback {
   padding-top: 10px;
 }
 
-#time {
+#recorder time {
   position: absolute;
   top: 0px;
   right: 0px;
@@ -15,87 +63,106 @@
   color: white;
 }
 
-#wami {
+#recorder .wami {
   margin-left: 100px;
 }
 </style>
-<button id="start">Start Recording</button>
-<button id="stop">Stop Recording</button>
-<div id="playback"></div>
-<div id="time">Not currently recording.</div>
-<div id="wami"></div>
+<div id="recorder">
+  <button class="start">Start Recording</button>
+  <button class="stop">Stop Recording</button>
+  <div class="playback"></div>
+  <time></time>
+  <div class="wami" id="wami"></div>
+<div>
 <!-- swfobject is a commonly used library to embed Flash content -->
 <script src="swfobject.js"></script>
 <script src="jquery.min.js"></script>
 <!-- Setup the recorder interface -->
 <script src="recorder.js"></script>
 <script>
-var recordState = "loading";
-var recordStart = 0;
+function Recorder(options) {
+  var recordState,
+      recordStart = 0,
+      baseURL = options.baseURL || '',
+      wami = options.wami || window.Wami,
+      el = $(options.element);
 
-setInterval(function() {
-  var now = Date.now();
-  if (recordStart)
-    $("#time").text(((now - recordStart) / 1000).toFixed(2));
-}, 50);
+  function setRecordState(state) {
+    var RECORDING_STATES = "loading idle recording uploading";
 
-$("#stop").click(function stopRecording() {
-  if (recordState == "recording") {
-    Wami.stopRecording();
-    recordState = "uploading";
-    jQuery.ajax({
-      type: 'POST',
-      url: '/metadata',
-      data: JSON.stringify({hi: 'there'}),
-      success: function() {
-        console.log("metadata uploaded.");
-      }
-    });
+    recordState = state;
+    el.removeClass(RECORDING_STATES).addClass(state);
   }
-});
 
-$("#start").click(function startRecording() {
-  var playback = $("#playback");
-  if (recordState != "idle")
-    return;
-  recordState = "recording";
-  playback.empty();
-  Wami.startRecording("/audio",
-    Wami.nameCallback(function() {
-      console.log("START");
-      recordStart = Date.now();
-    }),
-    Wami.nameCallback(function() {
-      playback.empty();
-      var audio = document.createElement("audio");
-      audio.setAttribute("controls", "controls");
-      var source = document.createElement("source");
-      source.setAttribute("src", "outfile.mp3?bust=" + recordStart);
-      source.setAttribute("type", "audio/mp3");
-      audio.appendChild(source);
-      source = document.createElement("source");
-      source.setAttribute("src", "outfile.ogg?bust=" + recordStart);
-      source.setAttribute("type", "audio/ogg");
-      audio.appendChild(source);
-      playback.append(audio);
-      recordState = "idle";
-      recordStart = 0;
-    }),
-    Wami.nameCallback(function() {
-      console.log("ERROR");
-      alert("ERROR");
-      recordState = "idle";
-      recordStart = 0;
-    })
-  );
-});
+  setRecordState("loading");
+  wami.setup({
+    id : $(".wami", el).attr("id"),
+    onReady : function() {
+      setRecordState("idle");
+    }
+  });
+
+  window.setInterval(function() {
+    var now = Date.now();
+    if (recordStart)
+      $("time", el).text(((now - recordStart) / 1000).toFixed(2));
+  }, 50);
+
+  $(".stop", el).click(function stopRecording() {
+    if (recordState == "recording") {
+      wami.stopRecording();
+      setRecordState("uploading");
+      jQuery.ajax({
+        type: 'POST',
+        url: baseURL + '/metadata',
+        data: JSON.stringify({hi: 'there'}),
+        success: function() {
+          console.log("metadata uploaded.");
+        }
+      });
+    }
+  });
+
+  $(".start", el).click(function startRecording() {
+    var playback = $(".playback", el);
+    if (recordState != "idle")
+      return;
+    setRecordState("recording");
+    playback.empty();
+    wami.startRecording(baseURL + "/audio",
+      wami.nameCallback(function() {
+        console.log("START");
+        recordStart = Date.now();
+      }),
+      wami.nameCallback(function() {
+        playback.empty();
+        var audio = document.createElement("audio");
+        audio.setAttribute("controls", "controls");
+        var source = document.createElement("source");
+        source.setAttribute("src", "outfile.mp3?bust=" + recordStart);
+        source.setAttribute("type", "audio/mp3");
+        audio.appendChild(source);
+        source = document.createElement("source");
+        source.setAttribute("src", "outfile.ogg?bust=" + recordStart);
+        source.setAttribute("type", "audio/ogg");
+        audio.appendChild(source);
+        playback.append(audio);
+        setRecordState("idle");
+        recordStart = 0;
+      }),
+      wami.nameCallback(function() {
+        console.log("ERROR");
+        alert("ERROR");
+        setRecordState("idle");
+        recordStart = 0;
+      })
+    );
+  });
+}
 
 $(window).ready(function() {
-  Wami.setup({
-    id : "wami",
-    onReady : function() {
-      recordState = "idle";
-    }
+  window._recorder = Recorder({
+    element: $("#recorder")
   });
 });
 </script>
