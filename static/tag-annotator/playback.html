@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Tag Annotator Player</title>
+<audio id="audio" controls>
+  <source src="../recording.mp3" type="audio/mp3">
+  <source src="../recording.ogg" type="audio/ogg">
+</audio>
+<div id="current-tag"></div>
+<script src="../js/jquery.min.js"></script>
+<script src="http://popcornjs.org/code/dist/popcorn.min.js"></script>
+<script src="tag.popcorn.js"></script>
+<script>
+$(window).ready(function() {
+  $.getJSON("../metadata.json", function(metadata) {
+    Popcorn.tag.annotate(Popcorn("#audio"), metadata, $("#current-tag"));
+  });
+});
+</script>
