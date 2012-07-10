@@ -109,11 +109,13 @@ function Recorder(options) {
   function setRecordState(state) {
     var RECORDING_STATES = "loading idle pre-recording recording uploading";
 
-    if (state == "recording")
+    if (state == "recording") {
       self.startTime = recordStart = Date.now();
-    else if (state == "idle")
+    } else if (state == "idle") {
       self.startTime = recordStart = 0;
-
+      self.metadata = {};
+    }
+    
     recordState = state;
     self.state = state;
     el.removeClass(RECORDING_STATES).addClass(state);
@@ -166,7 +168,7 @@ function Recorder(options) {
         jQuery.ajax({
           type: 'POST',
           url: baseURL + '/metadata',
-          data: JSON.stringify({hi: 'there'}),
+          data: JSON.stringify(self.metadata),
           success: function() {
             playback.append(audio);
           },
@@ -189,10 +191,12 @@ function Recorder(options) {
 }
 
 $(window).ready(function() {
-  window._recorder = Recorder({
+  var recorder = window._recorder = Recorder({
     element: $("#recorder")
   }).on("state-change", function(event) {
     console.log("STATE CHANGE", this.state, this.startTime);
+    if (this.state == "recording")
+      this.metadata = {startTime: Date.now()};
   }).on("error", function(event, message) {
     console.log("ERROR", message);
   });
