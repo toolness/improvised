@@ -111,9 +111,9 @@ function Recorder(options) {
 
     if (state == "recording") {
       self.startTime = recordStart = Date.now();
+      self.metadata = {};
     } else if (state == "idle") {
       self.startTime = recordStart = 0;
-      self.metadata = {};
     }
     
     recordState = state;
@@ -144,7 +144,19 @@ function Recorder(options) {
     id : $(".wami", el).attr("id"),
     onReady : function() {
       insertAudioElement();
-      setRecordState("idle");
+      jQuery.ajax({
+        url: baseURL + "/metadata.json",
+        dataType: 'json',
+        success: function(metadata) {
+          self.metadata = metadata;
+        },
+        error: function() {
+          self.metadata = {};
+        },
+        complete: function() {
+          setRecordState("idle");
+        }
+      });
     }
   });
 
