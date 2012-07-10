@@ -139,11 +139,11 @@ function Recorder(options) {
         var audio = document.createElement("audio");
         audio.setAttribute("controls", "controls");
         var source = document.createElement("source");
-        source.setAttribute("src", "outfile.mp3?bust=" + recordStart);
+        source.setAttribute("src", "recording.mp3?bust=" + recordStart);
         source.setAttribute("type", "audio/mp3");
         audio.appendChild(source);
         source = document.createElement("source");
-        source.setAttribute("src", "outfile.ogg?bust=" + recordStart);
+        source.setAttribute("src", "recording.ogg?bust=" + recordStart);
         source.setAttribute("type", "audio/ogg");
         audio.appendChild(source);
         playback.append(audio);

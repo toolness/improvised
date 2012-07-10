@@ -17,7 +17,7 @@ app.post('/metadata', function(req, res) {
 
 app.post('/audio', function(req, res) {
   var name = req.get('name', 'UNKNOWN'),
-      basefilename = STATIC_DIR + '/outfile',
+      basefilename = STATIC_DIR + '/recording',
       wavfilename = basefilename + '.wav',
       outfile = fs.createWriteStream(wavfilename);
 
