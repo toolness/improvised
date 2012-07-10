@@ -3,16 +3,15 @@
 <title>Recorder Thing</title>
 <style>
 body {
-  background: #f0f0f0;
-  margin: 0;
-  padding: 0;
 }
 
 #recorder {
   position: relative;
+  background: #f0f0f0;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 12px;
   padding: 20px;
+  min-height: 128px;
 }
 
 #recorder button {
@@ -22,6 +21,8 @@ body {
   background: gray;
   color: white;
   padding: 10px;
+  position: relative;
+  z-index: 1000;
 }
 
 #recorder button:hover {
@@ -43,7 +44,7 @@ body {
 }
 
 #recorder:not(.recording) time {
-  display: none;
+  opacity: 0;
 }
 
 #recorder:not(.idle) .start {
@@ -51,27 +52,36 @@ body {
 }
 
 #recorder .playback {
-  padding-top: 10px;
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  width: 100%;
+}
+
+#recorder .playback audio {
+  width: 100%;
 }
 
 #recorder time {
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  padding: 10px;
-  background: firebrick;
-  color: white;
+  padding-left: 10px;
+  color: firebrick;
+}
+
+#recorder time:after {
+  content: 's';
 }
 
 #recorder .wami {
-  margin-left: 100px;
+  min-height: 10px;
+  min-width: 10px;
 }
 </style>
 <div id="recorder">
   <button class="start">Start Recording</button>
   <button class="stop">Stop Recording</button>
-  <div class="playback"></div>
   <time></time>
+  <div class="playback"></div>
   <div class="wami" id="wami"></div>
 <div>
 <!-- swfobject is a commonly used library to embed Flash content -->
@@ -85,13 +95,29 @@ function Recorder(options) {
       recordStart = 0,
       baseURL = options.baseURL || '',
       wami = options.wami || window.Wami,
-      el = $(options.element);
+      el = $(options.element),
+      self = {
+        el: el,
+        on: function(event, handler) {
+          el.bind(event, function(event, arg) {
+            handler.call(self, event, arg);
+          });
+          return self;
+        }
+      };
 
   function setRecordState(state) {
-    var RECORDING_STATES = "loading idle recording uploading";
+    var RECORDING_STATES = "loading idle pre-recording recording uploading";
+
+    if (state == "recording")
+      self.startTime = recordStart = Date.now();
+    else if (state == "idle")
+      self.startTime = recordStart = 0;
 
     recordState = state;
+    self.state = state;
     el.removeClass(RECORDING_STATES).addClass(state);
+    el.trigger("state-change");
   }
 
   setRecordState("loading");
@@ -112,14 +138,6 @@ function Recorder(options) {
     if (recordState == "recording") {
       wami.stopRecording();
       setRecordState("uploading");
-      jQuery.ajax({
-        type: 'POST',
-        url: baseURL + '/metadata',
-        data: JSON.stringify({hi: 'there'}),
-        success: function() {
-          console.log("metadata uploaded.");
-        }
-      });
     }
   });
 
@@ -127,12 +145,11 @@ function Recorder(options) {
     var playback = $(".playback", el);
     if (recordState != "idle")
       return;
-    setRecordState("recording");
+    setRecordState("pre-recording");
     playback.empty();
     wami.startRecording(baseURL + "/audio",
       wami.nameCallback(function() {
-        console.log("START");
-        recordStart = Date.now();
+        setRecordState("recording");
       }),
       wami.nameCallback(function() {
         playback.empty();
@@ -146,23 +163,38 @@ function Recorder(options) {
         source.setAttribute("src", "recording.ogg?bust=" + recordStart);
         source.setAttribute("type", "audio/ogg");
         audio.appendChild(source);
-        playback.append(audio);
-        setRecordState("idle");
-        recordStart = 0;
+        jQuery.ajax({
+          type: 'POST',
+          url: baseURL + '/metadata',
+          data: JSON.stringify({hi: 'there'}),
+          success: function() {
+            playback.append(audio);
+          },
+          error: function() {
+            el.trigger("error", "failed to upload metadata");
+          },
+          complete: function() {
+            setRecordState("idle");
+          }
+        });
       }),
-      wami.nameCallback(function() {
-        console.log("ERROR");
-        alert("ERROR");
+      wami.nameCallback(function(message) {
+        el.trigger("error", message);
         setRecordState("idle");
-        recordStart = 0;
       })
     );
   });
+  
+  return self;
 }
 
 $(window).ready(function() {
   window._recorder = Recorder({
     element: $("#recorder")
+  }).on("state-change", function(event) {
+    console.log("STATE CHANGE", this.state, this.startTime);
+  }).on("error", function(event, message) {
+    console.log("ERROR", message);
   });
 });
 </script>
