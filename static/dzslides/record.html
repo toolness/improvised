@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../css/recorder-widget.css">
+<title>DZSlides Recorder</title>
+<style>
+html, body {
+  width: 100%;
+  height: 100%;
+  font-size: 0;
+  margin: 0;
+  padding: 0;
+}
+
+iframe {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  border: none;
+}
+
+#my-recorder {
+  position: absolute;
+  width: 100%;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.5);
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+</style>
+<div class="recorder" id="my-recorder">
+  <button class="start">Start Recording</button>
+  <button class="stop">Stop Recording</button>
+  <time></time>
+  <div class="playback"></div>
+  <div class="wami" id="wami"></div>
+</div>
+<iframe id="dzslides"></iframe>
+<!-- swfobject is a commonly used library to embed Flash content -->
+<script src="../js/swfobject.js"></script>
+<script src="../js/jquery.min.js"></script>
+<!-- Setup the recorder interface -->
+<script src="../js/recorder.js"></script>
+<script src="../js/recorder-widget.js"></script>
+<script src="http://popcornjs.org/code/dist/popcorn.min.js"></script>
+<script src="dzslides.popcorn.js"></script>
+<script>
+$(window).ready(function() {
+  Dz.titlePrefix = "Recording: ";
+  Dz.init($("#dzslides")[0], "template.html");
+  var recorder = window._recorder = RecorderWidget({
+    element: $("#my-recorder"),
+    baseURL: ".."
+  }).on("state-change", function(event) {
+    console.log("STATE CHANGE", this.state, this.startTime);
+    if (this.state == "recording") {
+      Dz.postMsg(Dz.view, "SET_CURSOR", "1.0");
+      Dz.startRecording(this);
+    } else if (this.state == "idle" && this.metadata) {
+      var audio = this.el.find("audio")[0];
+      if (audio)
+        Dz.annotate(Popcorn(audio), this.metadata);
+    }
+  }).on("error", function(event, message) {
+    console.log("ERROR", message);
+  });
+});
+</script>

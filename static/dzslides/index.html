@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>DZSlides Player</title>
+<style>
+html, body {
+  width: 100%;
+  height: 100%;
+  font-size: 0;
+  margin: 0;
+  padding: 0;
+}
+
+iframe {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  border: none;
+}
+
+audio {
+  position: absolute;
+  width: 100%;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  z-index: 1000;
+}
+</style>
+<audio id="audio" controls>
+  <source src="../recording.mp3" type="audio/mp3">
+  <source src="../recording.ogg" type="audio/ogg">
+</audio>
+<iframe id="dzslides"></iframe>
+<script src="http://popcornjs.org/code/dist/popcorn.min.js"></script>
+<script src="dzslides.popcorn.js"></script>
+<script>
+var req = new XMLHttpRequest();
+req.open("GET", "../metadata.json");
+req.onload = function() {
+  var dzslides = document.getElementById("dzslides");
+  Dz.init(dzslides, "template.html", function() {
+    Dz.annotate(Popcorn("#audio"), JSON.parse(req.responseText));
+  });
+};
+req.send(null);
+</script>
