@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-<link rel="stylesheet" href="css/recorder-widget.css">
-<title>Tag Annotator</title>
+<link rel="stylesheet" href="../css/recorder-widget.css">
+<title>Tag Annotator Recorder</title>
 <style>
 div.tag {
   padding: 8px;
@@ -33,11 +33,11 @@ div.tag:active {
 </div>
 <div id="current-tag"></div>
 <!-- swfobject is a commonly used library to embed Flash content -->
-<script src="js/swfobject.js"></script>
-<script src="js/jquery.min.js"></script>
+<script src="../js/swfobject.js"></script>
+<script src="../js/jquery.min.js"></script>
 <!-- Setup the recorder interface -->
-<script src="js/recorder.js"></script>
-<script src="js/recorder-widget.js"></script>
+<script src="../js/recorder.js"></script>
+<script src="../js/recorder-widget.js"></script>
 <script src="http://popcornjs.org/code/dist/popcorn.min.js"></script>
 <script id="tags" type="text/plain">
 beets
@@ -114,7 +114,8 @@ $(window).ready(function() {
     Popcorn.tag.record(recorder, $(this).text(), currTag);
   });
   var recorder = window._recorder = RecorderWidget({
-    element: $("#my-recorder")
+    element: $("#my-recorder"),
+    baseURL: ".."
   }).on("state-change", function(event) {
     console.log("STATE CHANGE", this.state, this.startTime);
     if (this.state == "recording") {

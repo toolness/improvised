@@ -37,11 +37,11 @@ function RecorderWidget(options) {
     var audio = document.createElement("audio");
     audio.setAttribute("controls", "controls");
     var source = document.createElement("source");
-    source.setAttribute("src", "recording.mp3" + cacheBuster);
+    source.setAttribute("src", baseURL + "/recording.mp3" + cacheBuster);
     source.setAttribute("type", "audio/mp3");
     audio.appendChild(source);
     source = document.createElement("source");
-    source.setAttribute("src", "recording.ogg" + cacheBuster);
+    source.setAttribute("src", baseURL + "/recording.ogg" + cacheBuster);
     source.setAttribute("type", "audio/ogg");
     audio.appendChild(source);
     playback.append(audio);
@@ -50,6 +50,7 @@ function RecorderWidget(options) {
   setRecordState("loading");
   wami.setup({
     id : $(".wami", el).attr("id"),
+    swfUrl : baseURL + "/Wami.swf",
     onReady : function() {
       insertAudioElement();
       jQuery.ajax({
