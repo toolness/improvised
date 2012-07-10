@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<link rel="stylesheet" href="css/recorder-widget.css">
+<title>Tag Annotator</title>
+<style>
+div.tag {
+  padding: 8px;
+  background: gray;
+  cursor: pointer;
+}
+
+div.tag:hover {
+  background: black;
+  color: white;
+}
+
+div.tag:active {
+  color: yellow;
+}
+
+#current-tag {
+  min-height: 50px;
+  padding: 8px;
+  font-size: 20px;
+}
+</style>
+<div class="recorder" id="my-recorder">
+  <button class="start">Start Recording</button>
+  <button class="stop">Stop Recording</button>
+  <time></time>
+  <div class="playback"></div>
+  <div class="wami" id="wami"></div>
+</div>
+<div id="current-tag"></div>
+<!-- swfobject is a commonly used library to embed Flash content -->
+<script src="js/swfobject.js"></script>
+<script src="js/jquery.min.js"></script>
+<!-- Setup the recorder interface -->
+<script src="js/recorder.js"></script>
+<script src="js/recorder-widget.js"></script>
+<script src="http://popcornjs.org/code/dist/popcorn.min.js"></script>
+<script id="tags" type="text/plain">
+beets
+mongrel
+dodecahedron
+saladmancer
+</script>
+<script>
+// This is just like Popcorn's code plugin, but even simpler
+// because we don't need an onFrame callback.
+
+Popcorn.plugin("tag", function(options, f) {
+  return {
+    start: function(event, options) {
+      options.el.text(options.tag);
+    },
+    end: function(event, options) {
+      options.el.text('');
+    }
+  };
+});
+
+function annotate(pop, metadata) {
+  function completeLastEntry(endTime) {
+    var entry = lastEntry;
+    if (!entry)
+      return;
+    pop.tag({
+      start: entry.start,
+      end: endTime,
+      tag: entry.tag,
+      el: $("#current-tag")
+    });
+    lastEntry = null;
+  }
+  
+  var lastEntry = {
+    start: 0,
+    tag: ""
+  };
+  metadata.log.forEach(function(entry) {
+    var SYNC_OFFSET = 0.75;
+    completeLastEntry(entry.time - SYNC_OFFSET - 0.01);
+    lastEntry = {
+      start: entry.time - SYNC_OFFSET,
+      tag: entry.tag
+    };
+  });
+  completeLastEntry(999999);
+}
+
+$(window).ready(function() {
+  $("#tags").text().trim().split('\n').forEach(function(tag) {
+    var div = $('<div class="tag"></div>').text(tag).appendTo("body");
+  });
+  $(window).on("click", ".tag", function() {
+    var tag = $(this).text();
+    var time = (Date.now() - recorder.startTime) / 1000;
+    if (recorder.state == "recording") {
+      recorder.metadata.log.push({
+        time: time,
+        tag: tag
+      });
+      $("#current-tag").text(tag + " @ " + time.toFixed(2) + "s");
+    }
+  });
+  var recorder = window._recorder = RecorderWidget({
+    element: $("#my-recorder")
+  }).on("state-change", function(event) {
+    console.log("STATE CHANGE", this.state, this.startTime);
+    if (this.state == "recording") {
+      this.metadata = {log: []};
+      $("#current-tag").empty();
+    } else if (this.state == "idle" && this.metadata) {
+      var audio = this.el.find("audio")[0];
+      if (audio)
+        annotate(Popcorn(audio), this.metadata);
+    }
+  }).on("error", function(event, message) {
+    console.log("ERROR", message);
+  });
+});
+</script>
