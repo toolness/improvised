@@ -51,22 +51,23 @@ iframe {
 <script>
 $(window).ready(function() {
   Dz.titlePrefix = "Recording: ";
-  Dz.init($("#dzslides")[0], "template.html");
-  var recorder = window._recorder = RecorderWidget({
-    element: $("#my-recorder"),
-    baseURL: ".."
-  }).on("state-change", function(event) {
-    console.log("STATE CHANGE", this.state, this.startTime);
-    if (this.state == "recording") {
-      Dz.postMsg(Dz.view, "SET_CURSOR", "1.0");
-      Dz.startRecording(this);
-    } else if (this.state == "idle" && this.metadata) {
-      var audio = this.el.find("audio")[0];
-      if (audio)
-        Dz.annotate(Popcorn(audio), this.metadata);
-    }
-  }).on("error", function(event, message) {
-    console.log("ERROR", message);
+  Dz.init($("#dzslides")[0], "template.html", function() {
+    var recorder = window._recorder = RecorderWidget({
+      element: $("#my-recorder"),
+      baseURL: ".."
+    }).on("state-change", function(event) {
+      console.log("STATE CHANGE", this.state, this.startTime);
+      if (this.state == "recording") {
+        Dz.postMsg(Dz.view, "SET_CURSOR", "1.0");
+        Dz.startRecording(this);
+      } else if (this.state == "idle" && this.metadata) {
+        var audio = this.el.find("audio")[0];
+        if (audio)
+          Dz.annotate(Popcorn(audio), this.metadata);
+      }
+    }).on("error", function(event, message) {
+      console.log("ERROR", message);
+    });
   });
 });
 </script>
