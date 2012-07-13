@@ -1,66 +1,159 @@
 <!DOCTYPE html>
 
 <meta charset="utf-8">
-<title>The Title Of Your Presentation</title>
+<title>Learning Webmaking on Mobile</title>
+<style>
+h2 code {
+  font-weight: normal;
+}
+
+.browser-support {
+  font-weight: normal;
+  color: gray;
+  font-size: 18px;
+  padding-top: 20px;
+  line-height: 32px;
+}
+
+.browser-support img {
+  height: 24px;
+  width: 24px;
+}
+
+.browser-support aside {
+  font-size: 12px;
+}
+
+.browser-support a {
+  color: inherit;
+}
+
+.browser-support img {
+  height: 16px;
+  width: 16px;
+}
+
+section aside {
+  text-align: center;
+  font-size: 18px;
+  padding: 20px;
+  color: gray;
+}
+
+a {
+  color: #E66124;
+}
+
+a:hover {
+  color: #FF9900;
+}
+
+li {
+  line-height: 60px;
+}
+</style>
 
 <!-- Your Slides -->
 <!-- One section is one slide -->
 
 <section>
-    <!-- This is the first slide -->
-    <h1>My Presentation</h1>
-    <footer>by John Doe</footer>
+  <!-- This is the first slide -->
+  <h1>Learning Webmaking on Mobile</h1>
+  <aside>(Not to be confused with learning webmaking <em>for</em> mobile.)</aside>
+  <footer>An experiment by
+    <a href="http://twitter.com/toolness">@toolness</a></footer>
 </section>
 
 <section>
-    <p>Some random text: But I've never been to the moon! You can see how I lived before I met you. Also Zoidberg.
-    I could if you hadn't turned on the light and shut off my stereo.</p>
+  <h2>How would one learn CSS selectors on a phone?</h2>
 </section>
 
 <section>
-    <h3>An incremental list</h3>
-    <ul class="incremental">
-      <li>Item 1
-      <li>Item 2
-      <li>Item 3
-    </ul>
-    <details>Some notes. They are only visible using onstage shell.</details>
+  <h2><code>#foo &gt; .bar</code></h2>
 </section>
 
 <section>
-  <blockquote>
-    Who's brave enough to fly into something we all keep calling a death sphere?
-  </blockquote>
+  <figure class="light">
+    <img class="half" src="media/ios-4.3-keyboard.jpg">
+    <figcaption>Where are <code>#</code>, <code>&gt;</code>, and <code>.</code> here?</figcaption>
+  </figure>
+  <details>It is very hard to type a lot of the special characters
+    needed for Webmaking on a cell phone keyboard.</details>
 </section>
 
 <section>
-    <h2>Part two</h2>
+  <h2>
+    One solution:
+    <br>
+    <img src="media/id-button.png">
+  </h2>
+  <details>Virtual keys can be used to provide affordances for
+    very tiny keyboards.</details>
 </section>
 
 <section>
-    <figure> <!-- Figures are used to display images and videos fullpage -->
-      <img src="http://placekitten.com/g/800/600">
-      <figcaption>An image</figcaption>
-    </figure>
-    <details>Kittens are so cute!</details>
+  <h3>And the usual for any good learning experience&hellip;</h3>
+  <ul class="incremental">
+    <li>Tiny, granular tasks</li>
+    <li>Fast feedback</li>
+  </ul>
 </section>
 
 <section>
-    <figure> <!-- Videos are automatically played -->
-      <video src="http://videos-cdn.mozilla.net/brand/Mozilla_Firefox_Manifesto_v0.2_640.webm" poster="http://www.mozilla.org/images/about/poster.jpg"></video>
-      <figcaption>A video</figcaption>
-    </figure>
+  <h3>
+    Check it out.
+    <br>
+    <br>
+    <video controls>
+      <source src="media/CssSelectorGame.mov" type="video/quicktime">
+      <source src="media/CssSelectorGame.webm" type"video/webm">
+    </video>
+  </h3>
 </section>
 
 <section>
-    <h2>End!</h2>
+  <h2>
+    Unexpected Benefits
+    <br>
+    <img src="media/all-buttons.png">
+  </h2>
+</section>
+
+<section>
+  <h2><a href="http://www.ehow.com/facts_6025161_differences-between-recall-recognition.html">Recognition vs. Recall</a></h2>
+</section>
+
+<section>
+  <h2><a href="http://en.wikipedia.org/wiki/Instructional_scaffolding">Instructional Scaffolding</a></h2>
+</section>
+
+<section>
+  <h2>Great for desktop keyboard noobs, too!</h2>
+</section>
+
+<section>
+  <h2>
+    <a href="http://toolness.github.com/css-selector-game/">Try it!</a>
+    <br>
+    <small>and <a href="https://github.com/toolness/css-selector-game">fork it</a>.</small>
+    <br>
+    <div class="browser-support">
+      <div>
+        works on desktop <img src="media/64-firefox.png" alt="Firefox"> <img src="media/64-safari.png" alt="Safari"> <img src="media/64-chrome.png" alt="Chrome"> <img src="media/64-ie.png" alt="Internet Explorer 9"> <img src="media/Opera_48x48.png" alt="Opera">.
+      </div>
+      <div>
+        works on mobile <img src="media/64-safari.png" alt="Safari"> <img src="media/64-chrome.png" alt="Chrome">.
+      </div>
+      <aside>
+        (support for mobile <img src="media/64-firefox.png" alt="Firefox"> coming
+        when bugs <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=763201">763201</a> and <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=764817">764817</a> are fixed.)
+      </aside>
+    </div>
+  </h2>
 </section>
 
 <!-- Your Style -->
 <!-- Define the style of your presentation -->
-
-<!-- Maybe a font from http://www.google.com/webfonts ? -->
-<link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet'>
 
 <style>
   html, .view body { background-color: black; counter-reset: slideidx; }
@@ -68,7 +161,7 @@
   /* A section is a slide. It's size is 800x600, and this will never change */
   section, .view head > title {
       /* The font from Google */
-      font-family: 'Oswald', arial, serif;
+      font-family: 'Helvetica Neue', Helvetica, arial, serif;
       font-size: 30px;
   }
 
@@ -88,7 +181,7 @@
   h1, h2 {
     margin-top: 200px;
     text-align: center;
-    font-size: 80px;
+    font-size: 60px;
   }
   h3 {
     margin: 100px 0 50px 100px;
@@ -124,8 +217,16 @@
     width: 100%;
     height: 100%;
   }
+  figure.light {
+    background-color: white;
+    color: black;
+  }
   figure > * {
     position: absolute;
+  }
+  figure > img.half, figure > video.half {
+    width: 50%; height: 50%;
+    top: 25%; left: 25%;
   }
   figure > img, figure > video {
     width: 100%; height: 100%;
@@ -190,6 +291,14 @@
   #progress-bar {
     height: 2px;
     background: #AAA;
+  }
+  
+  code {
+    font-family: Monaco, "Lucida Console", monospace;
+  }
+  
+  .light {
+    color: white;
   }
 </style>
 

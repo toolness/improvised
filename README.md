@@ -18,7 +18,13 @@ even recording will be fully web-native, once browsers start supporting
 Currently the project is highly experimental and completely undocumented,
 however, so play with this at your own risk. :)
 
+## Examples
+
+I used Improvised with DZSlides to create a narrated slideshow about
+a [CSS selector game][] that I made.
+
   [DZSlides]: http://paulrouget.com/dzslides/
   [popcorn]: http://popcornjs.org/
   [wami-recorder]: http://code.google.com/p/wami-recorder/
   [WebRTC]: http://www.webrtc.org/
+  [CSS selector game]: http://labs.toolness.com/temp/css-selector-game-preso/

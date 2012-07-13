@@ -31,15 +31,15 @@ audio {
 }
 </style>
 <audio id="audio" controls>
-  <source src="../recording.mp3" type="audio/mp3">
-  <source src="../recording.ogg" type="audio/ogg">
+  <source src="recording.mp3" type="audio/mp3">
+  <source src="recording.ogg" type="audio/ogg">
 </audio>
 <iframe id="dzslides"></iframe>
 <script src="http://popcornjs.org/code/dist/popcorn.min.js"></script>
 <script src="dzslides.popcorn.js"></script>
 <script>
 var req = new XMLHttpRequest();
-req.open("GET", "../metadata.json");
+req.open("GET", "metadata.json");
 req.onload = function() {
   var dzslides = document.getElementById("dzslides");
   Dz.init(dzslides, "template.html", function() {
