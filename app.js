@@ -1,11 +1,12 @@
 var express = require('express'),
     fs = require('fs'),
     spawn = require('child_process').spawn,
+    config = require('./config'),
     app = express.createServer();
 
 var STATIC_DIR = __dirname + '/static',
-    FFMPEG_VORBIS = 'ffmpeg',
-    FFMPEG_MP3 = '/Applications/ffmpegX.app/Contents/Resources/ffmpeg';
+    FFMPEG_VORBIS = config.ffmpeg.vorbis,
+    FFMPEG_MP3 = config.ffmpeg.mp3;
 
 app.post('/metadata', function(req, res) {
   var filename = STATIC_DIR + '/metadata.json',
